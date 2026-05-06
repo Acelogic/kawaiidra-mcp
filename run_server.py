@@ -8,6 +8,13 @@ from pathlib import Path
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
+# Import JPype before the MCP stdio event loop starts. On Windows, lazy-importing
+# JPype from inside an MCP tool handler can deadlock the stdio server.
+try:
+    import jpype  # noqa: F401
+except ImportError:
+    pass
+
 # Add src to path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
